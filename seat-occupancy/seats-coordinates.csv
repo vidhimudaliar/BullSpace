@@ -1,0 +1,7 @@
+label_name,bbox_x,bbox_y,bbox_width,bbox_height,image_name,image_width,image_height
+spot43,2059,2884,610,783,floor5-1.png,5712,4284
+spot42,2759,2856,471,728,floor5-1.png,5712,4284
+spot41,3300,2849,381,645,floor5-1.png,5712,4284
+spot40,3743,2835,305,575,floor5-1.png,5712,4284
+spot39,4111,2835,222,555,floor5-1.png,5712,4284
+spot38,4416,2835,208,499,floor5-1.png,5712,4284
