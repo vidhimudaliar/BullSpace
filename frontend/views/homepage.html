@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-image: url('../static/media/backgroundSpace.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .navbar {
+      background-color: #C1B687;
+      padding: 1px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-left {
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .vibrating-logo {
+      height: 100px;
+      transition: transform 0.2s ease-in-out;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .navbar-right {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .navbar-right a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .navbar-right img {
+      height: 46px;
+      width: 46px;
+      cursor: pointer;
+    }
+
+    .bell-icon {
+      height: 26px;
+      width: 26px;
+      cursor: pointer;
+    }
+
+    .todo-icon {
+      height: 28px;
+      width: 28px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .todo-icon:hover {
+      animation: vibrate 0.4s ease;
+    }
+
+    @keyframes vibrate {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      25% {
+        transform: rotate(3deg);
+      }
+
+      50% {
+        transform: rotate(-3deg);
+      }
+
+      75% {
+        transform: rotate(3deg);
+      }
+
+      100% {
+        transform: rotate(0deg);
+      }
+    }
+
+    .vibrate {
+      animation: vibrate 0.5s ease;
+    }
+
+    .vibrating-logo:hover,
+    .bell-icon:hover {
+      animation: vibrate 0.4s ease;
+    }
+
+    .profile-container {
+      position: relative;
+    }
+
+    .logout-popup {
+      position: absolute;
+      top: 42px;
+      right: 0;
+      background-color: white;
+      padding: 16px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      min-width: 180px;
+      text-align: left;
+      display: none;
+      z-index: 1000;
+    }
+
+    .profile-container:hover .logout-popup {
+      display: block;
+    }
+
+    .logout-popup a {
+      display: block;
+      color: #000;
+      font-weight: bold;
+      font-size: 16px;
+      text-decoration: none;
+      margin-bottom: 35px;
+      padding: 8px 6px;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+    }
+
+    .logout-popup a:hover {
+      background-color: #DCD1A2;
+    }
+
+    .content {
+      position: relative;
+      height: calc(100vh - 80px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 20px;
+    }
+
+    .content img.banner {
+      width: 700px;
+      height: auto;
+      margin-top: 60px;
+      margin-bottom: 10px;
+    }
+
+    .buttons-wrapper {
+      position: absolute;
+      top: 500px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .buttons-wrapper button {
+      background-color: #cfc493;
+      color: white;
+      border: none;
+      padding: 18px 35px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 5px;
+      width: 260px;
+      cursor: pointer;
+    }
+
+    .buttons-wrapper button:hover {
+      background-color: #DCD1A2;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="navbar">
+    <div class="navbar-left">
+      <!-- ✅ Changed to button-like image that vibrates & plays sound -->
+      <img src="../static/media/USFlogo.png" alt="USF Home Logo" class="vibrating-logo" id="bull-logo">
+    </div>
+    <div class="navbar-right">
+      <a href="availabilitymap.html">AVAILABILITY MAP</a>
+      <a href="https://lib.usf.edu/services/reserving-library-spaces/" target="_blank">RESERVE A STUDY ROOM</a>
+
+      <!-- ✅ To-Do List Button Icon -->
+      <a href="frontend/todopage.html">
+        <img src="../static/media/ButtonToDoList.png" alt="To-Do List" class="todo-icon">
+      </a>
+
+      <!-- 🔔 Notification Bell -->
+      <img src="../static/media/whitebell.png" alt="Notifications" title="Notifications" class="bell-icon" id="bell">
+
+      <div class="profile-container">
+        <img src="../static/media/circular_user.png" alt="Profile Icon" id="profile-icon">
+        <div class="logout-popup" id="logout-popup">
+          <a href="login.html">LOGOUT</a>
+          <a href="notifications.html">NOTIFICATION</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <img src="../static/media/homepageImage.png" alt="USF Libraries Banner" class="banner">
+
+    <div class="buttons-wrapper">
+      <button id="reserve-btn">RESERVE NOW</button>
+      <button id="availability-btn">AVAILABILITY MAP</button>
+      <a href="pomodoro.html">
+        <button id="pomodoro-btn">POMODORO</button>
+      </a>
+    </div>
+  </div>
+
+  <!-- ✅ Audio element -->
+  <audio id="bullSound" src="../static/media/meowBullSpace.wav" preload="auto"></audio>
+
+  <script>
+    // Bell click with vibration and redirect
+    const bell = document.getElementById('bell');
+    bell.addEventListener('click', () => {
+      bell.classList.add('vibrate');
+      setTimeout(() => {
+        bell.classList.remove('vibrate');
+        window.location.href = "notifications.html";
+      }, 500);
+    });
+
+    // Bull logo: vibrate and play sound
+    const bullLogo = document.getElementById('bull-logo');
+    const bullSound = document.getElementById('bullSound');
+
+    bullLogo.addEventListener('click', () => {
+      bullLogo.classList.add('vibrate');
+      bullSound.currentTime = 0;
+      bullSound.play();
+      setTimeout(() => {
+        bullLogo.classList.remove('vibrate');
+      }, 500);
+    });
+  </script>
+
+  <script src="../scripts/homepage.js"></script>
+</body>
+
+</html>

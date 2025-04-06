@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Spot Notifier Map</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-image: url("../static/media/backgroundSpace.png");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .go-back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #cfc493;
+      color: #2c2c2c;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 14px;
+      z-index: 999;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .title-image {
+      max-width: 500px;
+      width: 80%;
+      margin-top: 100px;
+      margin-bottom: 30px;
+    }
+
+    .map-wrapper {
+      background-color: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .map-image {
+      width: 889px;
+      height: 447px;
+      border-radius: 6px;
+    }
+
+    .seat-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: green;
+      border: 2px solid white;
+      z-index: 2;
+      cursor: pointer;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .favorite {
+      box-shadow: 0 0 5px 3px yellow;
+    }
+  </style>
+</head>
+
+<body>
+
+  <a href="homepage.html" class="go-back-button">← Go back</a>
+
+  <!-- 🔔 Title Image -->
+  <img src="../static/media/notificationsBull.png" alt="Notifications Title" class="title-image">
+
+  <div class="map-wrapper" id="map-container">
+    <img src="../static/media/imagemap.png" alt="Library Floor Plan" class="map-image">
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDZ1weHbBqNGqI8KeKyvfa-mXhK0XAwzBE",
+      authDomain: "library-31a65.firebaseapp.com",
+      databaseURL: "https://library-31a65-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "library-31a65",
+      storageBucket: "library-31a65.appspot.com",
+      messagingSenderId: "1061330667905",
+      appId: "1:1061330667905:web:8c7a012c48b20851dbc080",
+      measurementId: "G-V57G96KDNS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const favoriteSeats = new Set();
+    const notifiedSeats = new Set();
+
+    fetch("../static/media/test.json")
+      .then(response => response.json())
+      .then(data => {
+        const map = document.getElementById("map-container");
+
+        data.forEach((seat) => {
+          const dot = document.createElement("div");
+          dot.classList.add("seat-dot");
+          dot.style.left = `${seat.x + 453}px`;
+          dot.style.top = `${seat.y + 309}px`;
+
+          const seatId = seat.name.toLowerCase();
+          dot.id = seatId;
+          map.appendChild(dot);
+
+          const seatRef = ref(db, seatId);
+          onValue(seatRef, (snapshot) => {
+            const status = snapshot.val();
+            dot.style.backgroundColor = status === "occupied" ? "red" : "green";
+
+            if (favoriteSeats.has(seatId) && status === "available" && !notifiedSeats.has(seatId)) {
+              notifiedSeats.add(seatId);
+              alert(`🎉 Your favorite seat "${seat.name}" is now available!`);
+            }
+
+            if (status === "occupied") {
+              notifiedSeats.delete(seatId);
+            }
+          });
+
+          dot.addEventListener("click", () => {
+            if (favoriteSeats.has(seatId)) {
+              favoriteSeats.delete(seatId);
+              dot.classList.remove("favorite");
+              alert(`❌ Removed seat "${seat.name}" from favorites.`);
+            } else {
+              favoriteSeats.add(seatId);
+              dot.classList.add("favorite");
+              alert(`⭐ Favorited seat: "${seat.name}". You'll get a notification when it's free.`);
+            }
+          });
+        });
+      });
+  </script>
+
+</body>
+
+</html>

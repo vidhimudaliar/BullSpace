@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>BullSpace - Quiet Study Room</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url("../static/media/backgroundSpace.png");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .go-back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #cfc493;
+      color: #2c2c2c;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+      z-index: 999;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .go-back-button:hover {
+      background-color: #f3e49a;
+    }
+
+    .title-image {
+      width: 400px; /* Adjust this width if you want it smaller/larger */
+      max-width: 90%;
+      margin-bottom: 20px;
+      margin-top: 60px;
+    }
+
+    canvas {
+      background-color: #fff;
+      border: 2px solid #ccc;
+      border-radius: 20px;
+    }
+
+    .controls {
+      margin-top: 20px;
+      background-color: rgba(255, 255, 255, 0.85);
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .controls label {
+      margin: 10px 0 5px;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .controls input[type="number"],
+    .controls input[type="checkbox"] {
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background-color: #fff8e1; /* Beige background for inputs */
+      color: #333;
+      font-size: 1rem;
+    }
+
+    .controls button {
+      margin-top: 10px;
+      background-color: #cfc493;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+      width: 180px; /* Equal width for both buttons */
+      text-align: center;
+    }
+
+    .controls button:hover {
+      background-color: #dcd1a2;
+    }
+
+    .time-remaining {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 1px 1px 2px #000;
+    }
+  </style>
+</head>
+
+<body>
+
+  <a href="homepage.html" class="go-back-button">← Go back</a>
+
+  <!-- ✅ Title image -->
+  <img src="../static/media/pomodoroTitle.png" alt="Pomodoro Title" class="title-image" />
+
+  <canvas id="sandTimerCanvas" width="200" height="400"></canvas>
+
+  <div class="controls">
+    <label for="intervalInput">Enter Study Interval (minutes):</label>
+    <input type="number" id="intervalInput" min="1" max="180" value="25">
+
+    <label for="showTimeCheckbox">
+      <input type="checkbox" id="showTimeCheckbox" checked>
+      Show Time Remaining
+    </label>
+
+    <button onclick="startTimer()">Start Timer</button>
+    <button onclick="resetTimer()">Reset</button>
+  </div>
+
+  <div id="timeDisplay" class="time-remaining"></div>
+
+  <script>
+    const canvas = document.getElementById("sandTimerCanvas");
+    const ctx = canvas.getContext("2d");
+    const timeDisplay = document.getElementById("timeDisplay");
+    const showTimeCheckbox = document.getElementById("showTimeCheckbox");
+
+    let duration = 25 * 60;
+    let remaining = duration;
+    let intervalId = null;
+    let startTime = null;
+
+    function drawHourglass(progress) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = "#444";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(50, 50);
+      ctx.lineTo(150, 50);
+      ctx.lineTo(100, 200);
+      ctx.lineTo(150, 350);
+      ctx.lineTo(50, 350);
+      ctx.lineTo(100, 200);
+      ctx.lineTo(50, 50);
+      ctx.stroke();
+
+      const topHeight = (1 - progress) * 140;
+      const bottomHeight = progress * 140;
+
+      ctx.fillStyle = "#f4c542"; // Yellow sand color
+      ctx.beginPath();
+      ctx.moveTo(55, 55);
+      ctx.lineTo(145, 55);
+      ctx.lineTo(100, 55 + topHeight);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(100, 200, 4, 0, 2 * Math.PI);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(60, 345);
+      ctx.lineTo(140, 345);
+      ctx.lineTo(100, 345 - bottomHeight);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function formatTime(seconds) {
+      const min = Math.floor(seconds / 60);
+      const sec = Math.floor(seconds % 60);
+      return `${min}:${sec.toString().padStart(2, '0')}`;
+    }
+
+    function startTimer() {
+      if (intervalId) clearInterval(intervalId);
+      const input = document.getElementById("intervalInput").value;
+      if (!input || isNaN(input) || input <= 0) {
+        alert("Please enter a valid number of minutes.");
+        return;
+      }
+      duration = input * 60;
+      remaining = duration;
+      startTime = Date.now();
+
+      intervalId = setInterval(() => {
+        const elapsed = (Date.now() - startTime) / 1000;
+        remaining = Math.max(duration - elapsed, 0);
+
+        const progress = 1 - remaining / duration;
+        drawHourglass(progress);
+
+        if (showTimeCheckbox.checked) {
+          timeDisplay.textContent = `Time Remaining: ${formatTime(remaining)}`;
+        } else {
+          timeDisplay.textContent = "";
+        }
+
+        if (remaining <= 0) {
+          clearInterval(intervalId);
+          alert("Time's up! Take a break or start a new session.");
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      if (intervalId) clearInterval(intervalId);
+      drawHourglass(0);
+      timeDisplay.textContent = "";
+    }
+
+    drawHourglass(0);
+  </script>
+
+</body>
+</html>

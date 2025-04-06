@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      background-image: url("../static/media/backgroundSpace.png");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 120px;
+    }
+
+    h2 {
+      margin-top: 10px;
+      margin-bottom: 15px;
+      font-size: 30px;
+      color: #f3f3f3;
+    }
+
+    .usf-logo {
+      max-width: 160px;
+      height: auto;
+      margin-bottom: 10px;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    @keyframes vibrate {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(3deg); }
+      50% { transform: rotate(-3deg); }
+      75% { transform: rotate(3deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .usf-logo:hover {
+      animation: vibrate 0.4s ease;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 300px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      width: 100%;
+      color: #f3f3f3;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      margin-top: 14px;
+      padding: 10px 35px;
+      background-color: #cfc493;
+      color: white;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #DCD1A2;
+    }
+
+    .error {
+      color: #ff4d4d;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .lockout-message {
+      background-color: rgba(255, 100, 100, 1.0);
+      color: #FFFFFF;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      text-align: center;
+      width: 80%;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <img src="../static/media/USFlogo.png" alt="logo" class="usf-logo"> 
+    <h2>Login</h2>
+
+    <form id="loginForm">
+      <label for="username"> Username:</label>
+      <input type="text" id="username" name="username" required>
+
+      <label for="password"> Password:</label>
+      <input type="password" id="password" name="password" required>
+
+      <div style="display:flex; justify-content:center; width:100%;">
+        <button type="submit"> Login</button>
+      </div>
+
+      <div style="display:flex; justify-content:center; width:100%;"></div>
+
+      <div id="lockout-message" class="lockout-message" style="display:none;"></div> 
+    </form>
+
+    <p id="error-message" class="error"></p>
+  </div>
+
+  <script src="../scripts/login.js"></script>
+</body>
+</html>
