@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Your Weekly Canvas Tasks</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f0f0f0;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: white;
+      margin-bottom: 15px;
+      padding: 15px;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+
+<body>
+  <h1>📚 This Week's To-Do</h1>
+  <ul id="taskList">Loading tasks...</ul>
+
+  <script>
+    fetch('/api/weekly-tasks')
+      .then(res => {
+        console.log("Got response from Flask");
+        return res.json();
+      })
+      .then(tasks => {
+        const list = document.getElementById("taskList");
+        list.innerHTML = '';
+
+        if (tasks.length === 0) {
+          list.innerHTML = '<li>No tasks due this week! 🎉</li>';
+        }
+
+        tasks.forEach(task => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <strong>${task.title}</strong><br>
+            <em>${task.course}</em><br>
+            Due: ${task.due_date}
+          `;
+          list.appendChild(li);
+        });
+      })
+      .catch(err => {
+        document.getElementById("taskList").innerHTML = '<li>Error loading tasks</li>';
+        console.error("Fetch error:", err);
+      });
+  </script>
+</body>
+
+</html>
