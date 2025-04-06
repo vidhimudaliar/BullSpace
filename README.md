@@ -1,5 +1,5 @@
 # BullSpace: Your All-in-One Study Hub 🐂✨
-
+HackUSF 2025
 ## Inspiration 🌟
 Have you ever spent precious time wandering the library during finals week, desperately searching for an empty seat? Or struggled to find a quiet corner in a busy office when you need to focus? Instead of being productive, you end up wasting valuable time.
 
